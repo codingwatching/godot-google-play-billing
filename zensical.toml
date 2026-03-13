@@ -11,8 +11,9 @@ edit_uri  = "edit/master/docs/"
 
 nav = [
   "index.md",
-  "Installation.md",
-  "quickstart.md"
+  "installation.md",
+  "quickstart.md",
+  "google_play_console_setup.md"
 ]
 
 [project.theme]
