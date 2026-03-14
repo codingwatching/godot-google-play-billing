@@ -91,7 +91,7 @@ This signal is triggered after a purchase flow completes or when a pending purch
 
 - `#!gdscript response_code: int` - A value from [`BillingResponseCode`](enums.md#billingresponsecode).
 - `#!gdscript debug_message: String` - Debug message returned by Google Play billing library.
-- `#!gdscript purchases: Array` - List of purchase dictionaries.
+- `#!gdscript purchases: Array` - Array of purchase dictionaries owned by the user.
 
 Each purchase dictionary contains:
 
@@ -99,7 +99,7 @@ Each purchase dictionary contains:
 - `#!gdscript purchase_token: String`
 - `#!gdscript package_name: String`
 - `#!gdscript purchase_state: int` (see [`PurchaseState`](enums.md#purchasestate))
-- `#!gdscript purchase_time: int`
+- `#!gdscript purchase_time: int` (milliseconds since the epoch (Jan 1, 1970))
 - `#!gdscript original_json: String`
 - `#!gdscript is_acknowledged: bool`
 - `#!gdscript is_auto_renewing: bool`
@@ -130,7 +130,7 @@ Emitted after [`query_product_details(...)`](methods.md#query_product_details) f
 
 - `#!gdscript response_code: int` - A value from [`BillingResponseCode`](enums.md#billingresponsecode).
 - `#!gdscript debug_message: String` - Debug message returned by Google Play.
-- `#!gdscript product_details: Array` - List of product details dictionaries.
+- `#!gdscript product_details: Array` - Array of product details dictionaries.
 
 **Example**
 
@@ -155,7 +155,7 @@ Emitted when [`query_purchases(...)`](methods.md#query_purchases) completes.
 
 - `#!gdscript response_code: int` - A value from [`BillingResponseCode`](enums.md#billingresponsecode).
 - `#!gdscript debug_message: String` - Debug message returned by Google Play.
-- `#!gdscript purchases: Array` - List of purchase dictionaries owned by the user.
+- `#!gdscript purchases: Array` - Array of purchase dictionaries owned by the user.
 
 **Example**
 
