@@ -13,7 +13,13 @@ nav = [
   "index.md",
   "installation.md",
   "quickstart.md",
-  "google_play_console_setup.md"
+  "google_play_console_setup.md",
+  { "API Reference" = [
+    "api/billing_client.md",
+    "api/methods.md",
+    "api/signals.md",
+    "api/enums.md"
+  ]}
 ]
 
 [project.theme]
@@ -46,3 +52,14 @@ scheme = "slate"
 toggle.icon = "lucide/moon"
 toggle.name = "Switch to light mode"
 media = "(prefers-color-scheme: dark)"
+
+[project.markdown_extensions.toc]
+permalink = "🔗"
+permalink_title = "Anchor link to this section"
+
+
+[project.markdown_extensions.admonition]
+[project.markdown_extensions.pymdownx.details]
+[project.markdown_extensions.pymdownx.superfences]
+[project.markdown_extensions.pymdownx.highlight]
+[project.markdown_extensions.pymdownx.inlinehilite]
