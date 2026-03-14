@@ -4,16 +4,21 @@ icon: lucide/rocket
 
 # Quick Start
 
-This guide covers the essential steps to initialize billing, query products, and handle purchases, with simple explanations along the way.
+This guide walks through the minimal steps required to initialize billing, query products, and handle purchases.
 
+!!! info
+	Google Play Billing only works with builds uploaded to the **Google Play Store**.
+
+	You can continue following this guide, but before testing purchases, make sure your Play Console is properly configured.
+	See the [Google Play Console Setup](google_play_console_setup.md) guide.
 
 ## Initialize the plugin
 
 To use the GodotGooglePlayBilling API:
 
-1. Access the `BillingClient`.
+1. Access the [`BillingClient`](api/billing_client.md) class.
 2. Connect to its signals to receive billing results.
-3. Call `start_connection()`.
+3. Call [`start_connection()`](api/methods.md#start_connection).
 
 Initialization example:
 
@@ -33,11 +38,11 @@ func _ready():
 	billing_client.start_connection()
 ```
 
-The API must be in a connected state prior to use. The `connected` signal is sent when the connection process succeeds.
-You can also use `is_ready()` to determine if the plugin is ready for use.
-The `get_connection_state()` function returns the current connection state of the plugin.
+The API must be in a connected state prior to use. The [`connected`](api/signals.md#connected) signal is sent when the connection process succeeds.
+You can also use [`is_ready()`](api/methods.md#is_ready) to determine if the plugin is ready for use.
+The [`get_connection_state()`](api/methods.md#get_connection_state) function returns the current connection state of the plugin.
 
-Return values for `get_connection_state()`:
+Return values for [`get_connection_state()`](api/methods.md#get_connection_state):
 
 ```gdscript
 # Matches BillingClient.ConnectionState in the Play Billing Library.
@@ -52,15 +57,18 @@ enum ConnectionState {
 
 ## Query available items
 
-Once the API has connected, query product IDs using `query_product_details()`.
+Once the API has connected, query product IDs using [`query_product_details(...)`](api/methods.md#query_product_details).
 You must successfully complete a product details query before calling the
-`purchase()`, `purchase_subscription()`, or `update_subscription()` functions, or they will return an error.
+[`purchase(...)`](api/methods.md#purchase), [`purchase_subscription(...)`](api/methods.md#purchase_subscription),
+or [`update_subscription(...)](api/methods.md#update_subscription) functions, or they will return an error.
 
-`query_product_details()` takes two parameters: an array of product ID strings and the type of product being queried.
-The product type should be `BillingClient.ProductType.INAPP` for normal in-app purchases or `BillingClient.ProductType.SUBS` for subscriptions.
+[`query_product_details(...)`](api/methods.md#query_product_details) takes two parameters: an array of product ID strings
+and the type of product being queried. The product type should be `BillingClient.ProductType.INAPP` for normal in-app purchases
+or `BillingClient.ProductType.SUBS` for subscriptions.
+
 The ID strings in the array should match the product IDs defined in the Google Play Console entry for your app.
 
-Example use of `query_product_details()`:
+**Example**
 
 ```gdscript
 func _on_connected():
@@ -78,15 +86,16 @@ func _on_query_product_details_response(query_result: Dictionary):
 
 ## Query user purchases
 
-To retrieve a user's purchases, call the `query_purchases()` function passing a product type to query.
+To retrieve a user's purchases, call the [`query_purchases(...)`](api/methods.md#query_purchases) function passing a product type to query.
 The product type should be `BillingClient.ProductType.INAPP` for normal in-app purchases or `BillingClient.ProductType.SUBS` for subscriptions.
 
-The `query_purchases_response` signal is sent with the result.
+The [`query_purchases_response`](api/signals.md#query_product_details_response) signal is sent with the result.
 The signal has a single parameter: a `Dictionary` with a response code andeither an array of purchases or a debug message.
 
-**Note**: Only active subscriptions and non-consumed one-time purchases are included in the purchase array.
+!!! note
+	Only active subscriptions and non-consumed one-time purchases are included in the purchase array.
 
-Example use of `query_purchases()`:
+**Example**
 
 ```gdscript
 func _query_purchases():
@@ -104,17 +113,20 @@ func _on_query_purchases_response(query_result: Dictionary):
 
 ## Purchase an item
 
-To launch the billing flow for an item: Use `purchase()` for in-app products, passing the product ID string.
-Use `purchase_subscription()` for subscriptions, passing the product ID and base plan ID. You may also optionally provide an offer ID.
+To launch the billing flow for an item: Use [`purchase(...)`](api/methods.md#purchase) for in-app products, passing the product ID string.
+Use [`purchase_subscription(...)`](api/methods.md#purchase_subscription) for subscriptions, passing the product ID and base plan ID.
+You may also optionally provide an offer ID.
 
-For both `purchase()` and `purchase_subscription()`, you can optionally pass a boolean to indicate whether offers are personallised
+For both [`purchase(...)`](api/methods.md#purchase) and [`purchase_subscription(...)`](api/methods.md#purchase_subscription),
+you can optionally pass a boolean to indicate whether offers are personallised
 
 This method returns a dictionary indicating whether the billing flow was successfully launched.
 It includes a response code and either an array of purchases or a debug message.
 
-**Reminder**: you *must* query the product details for an item before you can pass it to `purchase()`.
+!!! info
+	you *must* query the product details for an item before you can pass it to [purchase(...)](api/methods.md#purchase).
 
-Example use of `purchase()`:
+**Example**
 
 ```gdscript
 var result = billing_client.purchase("my_iap_item")
@@ -125,7 +137,7 @@ else:
 	print("response_code: ", result.response_code, "debug_message: ", result.debug_message)
 ```
 
-The result of the purchase will be sent through the `on_purchase_updated` signal.
+The result of the purchase will be sent through the [`on_purchase_updated`](api/signals.md#on_purchase_updated) signal.
 
 ```gdscript
 func _on_purchase_updated(result: Dictionary):
@@ -140,26 +152,8 @@ func _on_purchase_updated(result: Dictionary):
 
 ### Processing a purchase item
 
-The `query_purchases_response` and `on_purchase_updated` signals provide an array of purchases in Dictionary format.
-The purchase Dictionary includes keys that map to values of the Google Play Billing [Purchase](https://developer.android.com/reference/com/android/billingclient/api/Purchase) class.
-
-Purchase fields:
-
-```gdscript
-order_id: String
-purchase_token: String
-package_name: String
-purchase_state: int
-purchase_time: int (milliseconds since the epoch (Jan 1, 1970))
-original_json: String
-is_acknowledged: bool
-is_auto_renewing: bool
-quantity: int
-signature: String
-product_ids: PackedStringArray
-```
-
-### Check purchase state
+The [`query_purchases_response`](api/signals.md#query_purchases_response) and [`on_purchase_updated`](api/signals.md#on_purchase_updated) signals
+provide an array of purchases in Dictionary format.
 
 Check the `purchase_state` value of a purchase to determine if a purchase was completed or is still pending.
 
@@ -179,19 +173,21 @@ If a purchase is in a `PENDING` state, you should not award the contents of the 
 until it reaches the `PURCHASED` state. If you have a store interface, you may wish to display information about pending purchases
 needing to be completed in the Google Play Store.
 
-For more details on pending purchases, see [Handling pending transactions](https://developer.android.com/google/play/billing/integrate#pending) in
-the Google Play Billing Library documentation.
+For more details on pending purchases, see [Handling pending transactions](https://developer.android.com/google/play/billing/integrate#pending)
+in the Google Play Billing Library documentation.
 
 ## Consumables
 
-If your in-app item is not a one-time purchase but a consumable item (e.g. coins) which can be purchased multiple times, you can consume an item
-by calling `consume_purchase()` passing the `purchase_token` value from the purchase dictionary.
+If your in-app item is not a one-time purchase but a consumable item (e.g. coins) which can be purchased multiple times, you can consume
+an item by calling [`consume_purchase(...)`](api/methods.md#consume_purchase) passing the `purchase_token` value from the purchase dictionary.
 
-Calling `consume_purchase()` automatically acknowledges a purchase.
+!!! info
+	Calling [consume_purchase(...)](api/methods.md#consume_purchase) automatically acknowledges a purchase.
 
-Consuming a product allows the user to purchase it again, it will no longer appear in subsequent `query_purchases()` calls unless it is repurchased.
+Consuming a product allows the user to purchase it again, it will no longer appear in subsequent
+[`query_purchases(...)`](api/methods.md#query_purchases) calls unless it is repurchased.
 
-Example use of `consume_purchase()`:
+**Example**
 
 ```gdscript
 func _process_purchase(purchase):
@@ -216,13 +212,14 @@ func _handle_purchase_token(purchase_token, purchase_successful):
 
 ## Acknowledging purchases
 
-If your in-app item is a one-time purchase, you must acknowledge the purchase by calling the `acknowledge_purchase()` function, passing
-the `purchase_token` value from the purchase dictionary. If you do not acknowledge a purchase within three days, the user automatically
-receives a refund, and Google Play revokes the purchase.
+If your in-app item is a one-time purchase, you must acknowledge the purchase by calling the
+[`acknowledge_purchase(...)`](api/methods.md#acknowledge_purchase) function, passing the `purchase_token` value from the purchase dictionary.
+If you do not acknowledge a purchase, the user automatically receives a refund, and Google Play revokes the purchase.
 
-If you are calling `consume_purchase()` it automatically acknowledges the purchase and you do not need to call `acknowledge_purchase()`.
+If you are calling [`consume_purchase(...)`](api/methods.md#consume_purchase) it automatically acknowledges the purchase and
+you do not need to call [`acknowledge_purchase(...)`](api/methods.md#acknowledge_purchase).
 
-Example use of `acknowledge_purchase()`:
+**Example**
 
 ```gdscript
 func _process_purchase(purchase):
@@ -249,57 +246,21 @@ func _handle_purchase_token(purchase_token, purchase_successful):
 
 ## Subscriptions
 
-Subscriptions work mostly like regular in-app items. Use `BillingClient.ProductType.SUBS` as the second argument to `query_product_details()`
-to get subscription details. Pass `BillingClient.ProductType.SUBS` to `query_purchases()` to get subscription purchase details.
+Subscriptions work mostly like regular in-app items. Use `BillingClient.ProductType.SUBS` as the
+second argument to [`query_product_details(...)`](api/methods.md#query_product_details) to get subscription details.
+Pass `BillingClient.ProductType.SUBS` to [`query_purchases(...)`](api/methods.md#query_purchases) to get subscription purchase details.
 
-You can check `is_auto_renewing` in the a subscription purchase returned from `query_purchases()` to see if a user has cancelled an auto-renewing subscription.
+You can check `is_auto_renewing` in the a subscription purchase returned from [`query_purchases(...)`](api/methods.md#query_purchases) to see
+if a user has cancelled an auto-renewing subscription.
 
 You need to acknowledge new subscription purchases, but not automatic subscription renewals.
 
-If you support upgrading or downgrading between different subscription levels, you need to use `update_subscription()` to call the subscription update flow
-to change an active subscription.
+If you support upgrading or downgrading between different subscription levels, you need to use
+[`update_subscription(...)`](api/methods.md#update_subscription) to call the subscription update flow to change an active subscription.
 
-Like `purchase()`, results are returned by the `on_purchase_updated` signal.
+Like [`purchase(...)`](api/methods.md#purchase), results are returned by the [`on_purchase_updated`](api/signals.md#on_purchase_updated) signal.
 
-These are the parameters of `update_subscription()`:
-
-```gdscript
-old_purchase_token: String # The purchase token of the currently active subscription
-replacement_mode: ReplacementMode # The replacement mode to apply to the subscription
-new_product_id: String # The product ID of the new subscription to switch to
-base_plan_id: String # The base plan ID of the target subscription
-offer_id: String # The offer ID under the base plan (optional)
-is_offer_personalized: bool # Whether to enable personalized pricing (optional)
-```
-
-The replacement modes values are defined as:
-
-```gdscript
-# Access in your script as: BillingClient.ReplacementMode.WITH_TIME_PRORATION
-enum ReplacementMode {
-	# Unknown...
-	UNKNOWN_REPLACEMENT_MODE = 0,
-
-	# The new plan takes effect immediately, and the remaining time will be prorated and credited to the user.
-	# Note: This is the default behavior.
-	WITH_TIME_PRORATION = 1,
-
-	# The new plan takes effect immediately, and the billing cycle remains the same.
-	CHARGE_PRORATED_PRICE = 2,
-
-	# The new plan takes effect immediately, and the new price will be charged on next recurrence time.
-	WITHOUT_PRORATION = 3,
-
-	# Replacement takes effect immediately, and the user is charged full price of new plan and
-	# is given a full billing cycle of subscription, plus remaining prorated time from the old plan.
-	CHARGE_FULL_PRICE = 5,
-
-	# The new purchase takes effect immediately, the new plan will take effect when the old item expires.
-	DEFERRED = 6,
-}
-```
-
-Example use of `update_subscription`:
+**Example**
 
 ```gdscript
 billing_client.update_subscription(_active_subscription_purchase.purchase_token, BillingClient.ReplacementMode.WITH_TIME_PRORATION, "new_sub_product_id", "base_plan_id", "new_user_offer_id", false)

@@ -38,14 +38,3 @@ The plugin is now active in your project.
     - The project is signed with a release keystore
 
 Export settings must match your Google Play configuration for billing to work correctly.
-
-## Upload a Test Build
-
-Google Play Billing only works with builds uploaded to Google Play.
-
-1. Export a signed Android AAB build.
-2. Upload it to:
-    - Internal testing track (recommended)
-    - Closed testing track
-3. Add your Google account as a tester.
-4. Install the app from the Play Store testing link.
