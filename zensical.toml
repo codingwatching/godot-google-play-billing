@@ -36,6 +36,7 @@ features = [
   "navigation.instant",
   "navigation.instant.progress",
   "navigation.top",
+  "navigation.expand",
   "search.highlight",
   "content.action.edit",
   "content.action.view"
