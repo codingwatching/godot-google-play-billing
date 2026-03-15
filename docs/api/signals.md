@@ -93,6 +93,8 @@ This signal is triggered after a purchase flow completes or when a pending purch
 - `#!gdscript debug_message: String` - Debug message returned by Google Play billing library.
 - `#!gdscript purchases: Array` - Array of purchase dictionaries owned by the user.
 
+### purchase dictionary
+
 Each purchase dictionary contains:
 
 - `#!gdscript order_id: String`
@@ -155,7 +157,7 @@ Emitted when [`query_purchases(...)`](methods.md#query_purchases) completes.
 
 - `#!gdscript response_code: int` - A value from [`BillingResponseCode`](enums.md#billingresponsecode).
 - `#!gdscript debug_message: String` - Debug message returned by Google Play.
-- `#!gdscript purchases: Array` - Array of purchase dictionaries owned by the user.
+- `#!gdscript purchases: Array` - Array of [`purchase dictionaries`](#purchase-dictionary) owned by the user.
 
 **Example**
 

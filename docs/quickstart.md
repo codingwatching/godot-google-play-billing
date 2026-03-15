@@ -253,6 +253,10 @@ Pass `BillingClient.ProductType.SUBS` to [`query_purchases(...)`](api/methods.md
 You can check `is_auto_renewing` in the a subscription purchase returned from [`query_purchases(...)`](api/methods.md#query_purchases) to see
 if a user has cancelled an auto-renewing subscription.
 
+!!! note
+	When a user's subscription is paused, the Play Billing Library doesn't return the subscription unless
+	the `include_suspended_subs` parameter is set to **true** in [`query_purchases(...)`](api/methods.md#query_purchases).
+
 You need to acknowledge new subscription purchases, but not automatic subscription renewals.
 
 If you support upgrading or downgrading between different subscription levels, you need to use
@@ -263,5 +267,5 @@ Like [`purchase(...)`](api/methods.md#purchase), results are returned by the [`o
 **Example**
 
 ```gdscript
-billing_client.update_subscription(_active_subscription_purchase.purchase_token, BillingClient.ReplacementMode.WITH_TIME_PRORATION, "new_sub_product_id", "base_plan_id", "new_user_offer_id", false)
+billing_client.update_subscription(active_sub_product_id, active_sub_purchase_token, BillingClient.ReplacementMode.CHARGE_PRORATED_PRICE, "new_sub_product_id", "base_plan_id", "new_user_offer_id", false)
 ```

@@ -91,9 +91,12 @@ enum ReplacementMode {
 
     # Replacement takes effect immediately, and the user is charged full price of new plan and
     # is given a full billing cycle of subscription, plus remaining prorated time from the old plan.
-    CHARGE_FULL_PRICE = 5,
+    CHARGE_FULL_PRICE = 4,
 
     # The new purchase takes effect immediately, the new plan will take effect when the old item expires.
-    DEFERRED = 6,
+    DEFERRED = 5,
+
+    # Indicates that this plan should remain unchanged in the new purchase.
+    KEEP_EXISTING = 6
 }
 ```
