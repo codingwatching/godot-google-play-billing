@@ -138,6 +138,7 @@ billing_client.purchase("coins_100", premium_purchase_id, new_login_offer_id)
 
 # billing_client.purchase("coins_100")
 ```
+
 ---
 
 ## purchase_subscription
