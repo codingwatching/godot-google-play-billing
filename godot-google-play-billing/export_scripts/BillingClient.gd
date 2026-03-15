@@ -119,9 +119,9 @@ func query_purchases(product_type: ProductType, include_suspended_subs: bool = f
 	if _plugin_singleton:
 		_plugin_singleton.queryPurchases(product_type_str, include_suspended_subs)
 
-func purchase(product_id: String, is_offer_personalized: bool = false) -> Dictionary:
+func purchase(product_id: String, purchase_option_id: String = "", offer_id: String = "", is_offer_personalized: bool = false) -> Dictionary:
 	if _plugin_singleton:
-		return _plugin_singleton.purchase(product_id, is_offer_personalized)
+		return _plugin_singleton.purchase(product_id, purchase_option_id, offer_id, is_offer_personalized)
 	return Dictionary()
 
 func purchase_subscription(product_id: String, base_plan_id: String, offer_id: String = "", is_offer_personalized: bool = false) -> Dictionary:

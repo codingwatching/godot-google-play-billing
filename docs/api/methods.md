@@ -112,7 +112,7 @@ billing_client.open_subscriptions_page("my_subscription_product_id")
 ## purchase
 
 ```gdscript
-func purchase(product_id: String, is_offer_personalized: bool = false) -> Dictionary
+func purchase(product_id: String, purchase_option_id: String = "", offer_id: String = "", is_offer_personalized: bool = false) -> Dictionary
 ```
 
 Starts the purchase flow for an in-app product.
@@ -123,12 +123,21 @@ Starts the purchase flow for an in-app product.
 | Parameter | Description |
 |-----------|-------------|
 | <span style="white-space:nowrap">`product_id`</span> | Identifier of the in-app product configured in the Google Play Console. |
+| <span style="white-space:nowrap">`purchase_option_id`</span> | Optional purchase option identifier returned from [`query_product_details_response`](signals.md#query_product_details_response). Used when the product have multiple purchase options, created in Google Play Console. |
+| <span style="white-space:nowrap">`offer_id`</span> | Optional offer identifier associated with the selected purchase option. |
 | <span style="white-space:nowrap">`is_offer_personalized`</span> | Indicates whether the price is personalized for the user. |
 
 **Returns** a `Dictionary` describing whether the billing flow launched successfully.
 
 Final purchase results are delivered through the [`on_purchase_updated`](signals.md#on_purchase_updated) signal.
 
+**Example**
+
+```gdscript
+billing_client.purchase("coins_100", premium_purchase_id, new_login_offer_id)
+
+# billing_client.purchase("coins_100")
+```
 ---
 
 ## purchase_subscription
