@@ -27,6 +27,7 @@ object Utils {
 		dict["original_json"] = purchase.originalJson
 		dict["is_acknowledged"] = purchase.isAcknowledged
 		dict["is_auto_renewing"] = purchase.isAutoRenewing
+		dict["is_suspended"] = purchase.isSuspended
 		dict["quantity"] = purchase.quantity
 		dict["signature"] = purchase.signature
 		dict["product_ids"] = purchase.products.toTypedArray()

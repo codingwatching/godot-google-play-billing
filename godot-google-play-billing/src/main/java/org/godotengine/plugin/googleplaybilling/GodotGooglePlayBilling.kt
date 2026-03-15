@@ -5,7 +5,7 @@ import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClient.BillingResponseCode
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingFlowParams
-import com.android.billingclient.api.BillingFlowParams.SubscriptionUpdateParams
+import com.android.billingclient.api.BillingFlowParams.ProductDetailsParams
 import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.ConsumeParams
 import com.android.billingclient.api.PendingPurchasesParams
@@ -106,7 +106,7 @@ class GodotGooglePlayBilling(godot: Godot): GodotPlugin(godot), PurchasesUpdated
 
 		billingClient.queryProductDetailsAsync(params) { billingResult, queryProductDetailsResult ->
 			if (billingResult.responseCode == BillingResponseCode.OK) {
-				var productDetailsList = queryProductDetailsResult.productDetailsList
+				val productDetailsList = queryProductDetailsResult.productDetailsList
 				if (productType == BillingClient.ProductType.INAPP) {
 					productDetailsMapInapp = productDetailsList.associateBy { it.productId }
 				} else if (productType == BillingClient.ProductType.SUBS) {
@@ -114,7 +114,7 @@ class GodotGooglePlayBilling(godot: Godot): GodotPlugin(godot), PurchasesUpdated
 				}
 				val productDetailsArray = Utils.convertProductDetailsListToArray(productDetailsList)
 				val unfetchedProductArray = Utils.convertUnfetchedProductListToArray(queryProductDetailsResult.unfetchedProductList)
-				var resultDict = Utils.createResultDict(billingResult.responseCode, billingResult.debugMessage)
+				val resultDict = Utils.createResultDict(billingResult.responseCode, billingResult.debugMessage)
 				resultDict["product_details"] = productDetailsArray
 				resultDict["unfetched_products"] = unfetchedProductArray
 				emitSignal("query_product_details_response", resultDict)
@@ -125,15 +125,18 @@ class GodotGooglePlayBilling(godot: Godot): GodotPlugin(godot), PurchasesUpdated
 	}
 
 	@UsedByGodot
-	fun queryPurchases(productType: String) {
+	fun queryPurchases(productType: String, includeSuspendedSubs: Boolean) {
 		val params = QueryPurchasesParams.newBuilder()
 			.setProductType(productType)
-			.build()
 
-		billingClient.queryPurchasesAsync(params) { billingResult, purchaseList ->
+		if (productType == BillingClient.ProductType.SUBS && includeSuspendedSubs) {
+			params.includeSuspendedSubscriptions(true)
+		}
+
+		billingClient.queryPurchasesAsync(params.build()) { billingResult, purchaseList ->
 			if (billingResult.responseCode == BillingResponseCode.OK) {
 				val purchasesArray = Utils.convertPurchaseListToArray(purchaseList)
-				var resultDict = Utils.createResultDict(billingResult.responseCode, billingResult.debugMessage)
+				val resultDict = Utils.createResultDict(billingResult.responseCode, billingResult.debugMessage)
 				resultDict["purchases"] = purchasesArray
 				emitSignal("query_purchases_response", resultDict)
 			} else {
@@ -147,8 +150,9 @@ class GodotGooglePlayBilling(godot: Godot): GodotPlugin(godot), PurchasesUpdated
 		productId: String,
 		basePlanId: String = "",
 		offerId: String = "",
+		oldProductId: String = "",
 		oldPurchaseToken: String = "",
-		replacementMode: Int = BillingFlowParams.SubscriptionUpdateParams.ReplacementMode.UNKNOWN_REPLACEMENT_MODE,
+		replacementMode: Int = ProductDetailsParams.SubscriptionProductReplacementParams.ReplacementMode.UNKNOWN_REPLACEMENT_MODE,
 		isOfferPersonalized: Boolean = false
 	): Dictionary {
 		val productDetailsMap = when (productType) {
@@ -163,8 +167,17 @@ class GodotGooglePlayBilling(godot: Godot): GodotPlugin(godot), PurchasesUpdated
 
 		val productDetails = productDetailsMap.getValue(productId)
 
-		val productParamsBuilder = BillingFlowParams.ProductDetailsParams.newBuilder()
+		val productParamsBuilder = ProductDetailsParams.newBuilder()
 			.setProductDetails(productDetails)
+
+		if (!oldProductId.isEmpty() && replacementMode != ProductDetailsParams.SubscriptionProductReplacementParams.ReplacementMode.UNKNOWN_REPLACEMENT_MODE) {
+			val replacementParams = ProductDetailsParams.SubscriptionProductReplacementParams.newBuilder()
+				.setOldProductId(oldProductId)
+				.setReplacementMode(replacementMode)
+				.build()
+
+			productParamsBuilder.setSubscriptionProductReplacementParams(replacementParams)
+		}
 
 		if (productDetails.productType == BillingClient.ProductType.SUBS) {
 			val offer = productDetails.subscriptionOfferDetails?.let { offers ->
@@ -194,10 +207,9 @@ class GodotGooglePlayBilling(godot: Godot): GodotPlugin(godot), PurchasesUpdated
 			flowParamsBuilder.setObfuscatedProfileId(obfuscatedProfileId)
 		}
 
-		if (!oldPurchaseToken.isEmpty() && replacementMode != SubscriptionUpdateParams.ReplacementMode.UNKNOWN_REPLACEMENT_MODE) {
-			val updateParams = SubscriptionUpdateParams.newBuilder()
+		if (!oldPurchaseToken.isEmpty()) {
+			val updateParams = BillingFlowParams.SubscriptionUpdateParams.newBuilder()
 				.setOldPurchaseToken(oldPurchaseToken)
-				.setSubscriptionReplacementMode(replacementMode)
 				.build()
 			flowParamsBuilder.setSubscriptionUpdateParams(updateParams)
 		}
@@ -210,7 +222,7 @@ class GodotGooglePlayBilling(godot: Godot): GodotPlugin(godot), PurchasesUpdated
 	override fun onPurchasesUpdated(billingResult: BillingResult, purchases: MutableList<Purchase>?) {
 		if (billingResult.responseCode == BillingResponseCode.OK && purchases != null) {
 			val purchasesArray = Utils.convertPurchaseListToArray(purchases)
-			var resultDict = Utils.createResultDict(billingResult.responseCode, billingResult.debugMessage)
+			val resultDict = Utils.createResultDict(billingResult.responseCode, billingResult.debugMessage)
 			resultDict["purchases"] = purchasesArray
 			emitSignal("on_purchase_updated", resultDict)
 		} else {
@@ -225,7 +237,7 @@ class GodotGooglePlayBilling(godot: Godot): GodotPlugin(godot), PurchasesUpdated
 			.build()
 
 		billingClient.consumeAsync(params) { billingResult, pToken ->
-			var resultDict = Utils.createResultDict(billingResult.responseCode, billingResult.debugMessage)
+			val resultDict = Utils.createResultDict(billingResult.responseCode, billingResult.debugMessage)
 			resultDict["token"] = pToken
 			emitSignal("consume_purchase_response", resultDict)
 		}
@@ -238,7 +250,7 @@ class GodotGooglePlayBilling(godot: Godot): GodotPlugin(godot), PurchasesUpdated
 			.build()
 
 		billingClient.acknowledgePurchase(params) { billingResult ->
-			var resultDict = Utils.createResultDict(billingResult.responseCode, billingResult.debugMessage)
+			val resultDict = Utils.createResultDict(billingResult.responseCode, billingResult.debugMessage)
 			resultDict["token"] = purchaseToken
 			emitSignal("acknowledge_purchase_response", resultDict)
 		}
@@ -265,8 +277,8 @@ class GodotGooglePlayBilling(godot: Godot): GodotPlugin(godot), PurchasesUpdated
 	}
 
 	@UsedByGodot
-	fun updateSubscription(productId: String, basePlanId: String, offerId: String, oldPurchaseToken: String, replacementMode: Int, isOfferPersonalized: Boolean = false): Dictionary {
-		return launchBillingFlow(BillingClient.ProductType.SUBS,productId, basePlanId, offerId, oldPurchaseToken, replacementMode, isOfferPersonalized)
+	fun updateSubscription(oldProductId: String, oldPurchaseToken: String, replacementMode: Int, newProductId: String, basePlanId: String, offerId: String, isOfferPersonalized: Boolean = false): Dictionary {
+		return launchBillingFlow(BillingClient.ProductType.SUBS, newProductId, basePlanId, offerId, oldProductId, oldPurchaseToken, replacementMode, isOfferPersonalized)
 	}
 
 	@UsedByGodot

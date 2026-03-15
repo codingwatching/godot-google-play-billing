@@ -186,16 +186,25 @@ billing_client.query_product_details(products_ids, BillingClient.ProductType.INA
 ## query_purchases
 
 ```gdscript
-func query_purchases(product_type: ProductType)
+func query_purchases(product_type: ProductType, include_suspended_subs: bool = false)
 ```
 
 Queries the user's currently owned purchases.
 
-Only **active subscriptions** and **unconsumed in-app purchases** are returned.
+By default, this returns **active subscriptions** and **unconsumed in-app purchases**.
 
 | Parameter | Description |
 |-----------|-------------|
 | <span style="white-space:nowrap">`product_type`</span> | [`ProductType`](enums.md#producttype) enum value indicating the product type being queried. |
+| <span style="white-space:nowrap">`include_suspended_subs`</span> | If `true`, suspended subscriptions will also be included in the results. |
+
+!!! info
+    Suspended subscriptions are still associated with the user but are **not active**. This can happen if the user paused the subscription or if the renewal payment method was declined.
+
+    The [`Purchase dictionary`](signals.md#purchase-dictionary) will contain `is_suspended = true` for suspended subscriptions.
+
+    When a subscription is suspended, you **should not grant access** to the subscription benefits.
+    Instead, guide the user to the subscription management page using [`open_subscriptions_page()`](methods.md#open_subscriptions_page) so they can update their payment method or resume the subscription.
 
 **Emits** the [`query_purchases_response`](signals.md#query_purchases_response) signal.
 
@@ -203,6 +212,8 @@ Only **active subscriptions** and **unconsumed in-app purchases** are returned.
 
 ```gdscript
 billing_client.query_purchases(BillingClient.ProductType.INAPP)
+
+billing_client.query_purchases(BillingClient.ProductType.SUBS, true)
 ```
 
 ---
@@ -265,7 +276,7 @@ Connection results are delivered through:
 ## update_subscription
 
 ```gdscript
-func update_subscription(old_purchase_token: String, replacement_mode: ReplacementMode, new_product_id: String, base_plan_id: String, offer_id: String = "", is_offer_personalized: bool = false) -> Dictionary
+func update_subscription(old_product_id: String, old_purchase_token: String, replacement_mode: ReplacementMode, new_product_id: String, base_plan_id: String, offer_id: String = "", is_offer_personalized: bool = false) -> Dictionary
 ```
 
 Updates an **existing subscription** to a new subscription product or plan.
@@ -286,5 +297,5 @@ Updates an **existing subscription** to a new subscription product or plan.
 **Example**
 
 ```gdscript
-billing_client.update_subscription(old_purchase_token, BillingClient.ReplacementMode.WITH_TIME_PRORATION, "premium_sub", "monthly")
+billing_client.update_subscription("monthly_adfree_sub", old_purchase_token, BillingClient.ReplacementMode.CHARGE_PRORATED_PRICE, "premium_sub", "monthly")
 ```
