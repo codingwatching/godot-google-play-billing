@@ -153,7 +153,12 @@ func _on_tab_container_tab_changed(tab: int) -> void:
 			billing_client.query_purchases(BillingClient.ProductType.INAPP)
 
 func _get_price_string(product: Dictionary) -> String:
-	return product.get("one_time_purchase_offer_details", {}).get("formatted_price", "N/A")
+	# TODO: Add Support for offers.
+	var list = product.get("one_time_purchase_offer_details_list", [])
+	for i in list:
+		if i.get("offer_id", "") == null:
+			return i.get("formatted_price", "N/A")
+	return "N/A"
 
 
 func _notification(what: int) -> void:

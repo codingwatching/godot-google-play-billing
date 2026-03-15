@@ -148,7 +148,7 @@ class GodotGooglePlayBilling(godot: Godot): GodotPlugin(godot), PurchasesUpdated
 	private fun launchBillingFlow(
 		productType: String,
 		productId: String,
-		basePlanId: String = "",
+		basePlanId: String = "", // purchaseOptionId for INAPP
 		offerId: String = "",
 		oldProductId: String = "",
 		oldPurchaseToken: String = "",
@@ -192,6 +192,23 @@ class GodotGooglePlayBilling(godot: Godot): GodotPlugin(godot), PurchasesUpdated
 				productParamsBuilder.setOfferToken(offer.offerToken)
 			} else {
 				val debugMessage = "Invalid base_plan_id or offer_id. Make sure base_plan_id exists, and offer_id is correct if provided."
+				return Utils.createResultDict(BillingResponseCode.DEVELOPER_ERROR, debugMessage)
+			}
+		} else if (basePlanId.isNotBlank()) {
+			// For INAPP products
+			val offer = productDetails.oneTimePurchaseOfferDetailsList?.let { offers ->
+				if (offerId.isBlank()) {
+					offers.firstOrNull { it.purchaseOptionId == basePlanId && it.offerId == null }
+				} else {
+					offers.firstOrNull { it.purchaseOptionId == basePlanId && it.offerId == offerId }
+				}
+			}
+
+			val token = offer?.offerToken
+			if (token != null) {
+				productParamsBuilder.setOfferToken(token)
+			} else {
+				val debugMessage = "Invalid purchase_option_id or offer_id. Make sure purchase_option_id exists, and offer_id is correct if provided."
 				return Utils.createResultDict(BillingResponseCode.DEVELOPER_ERROR, debugMessage)
 			}
 		}
@@ -267,8 +284,8 @@ class GodotGooglePlayBilling(godot: Godot): GodotPlugin(godot), PurchasesUpdated
 	}
 
 	@UsedByGodot
-	fun purchase(productId: String, isOfferPersonalized: Boolean = false): Dictionary {
-		return launchBillingFlow(BillingClient.ProductType.INAPP, productId, isOfferPersonalized = isOfferPersonalized)
+	fun purchase(productId: String, purchaseOptionId: String, offerId: String, isOfferPersonalized: Boolean = false): Dictionary {
+		return launchBillingFlow(BillingClient.ProductType.INAPP, productId, purchaseOptionId, offerId, isOfferPersonalized = isOfferPersonalized)
 	}
 
 	@UsedByGodot

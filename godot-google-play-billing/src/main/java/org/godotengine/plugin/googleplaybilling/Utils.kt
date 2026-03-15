@@ -68,7 +68,16 @@ object Utils {
 		dict["description"] = details.description
 		dict["product_type"] = details.productType
 
-		dict["one_time_purchase_offer_details"] = details.oneTimePurchaseOfferDetails?.let { oneTimeOfferToDict(it) }
+		val oneTimePurchaseOffers = details.oneTimePurchaseOfferDetailsList
+		if (!oneTimePurchaseOffers.isNullOrEmpty()) {
+			val array = arrayOfNulls<Any>(oneTimePurchaseOffers.size)
+			for (i in oneTimePurchaseOffers.indices) {
+				array[i] = oneTimeOfferToDict(oneTimePurchaseOffers[i])
+			}
+			dict["one_time_purchase_offer_details_list"] = array
+		} else {
+			dict["one_time_purchase_offer_details_list"] = null
+		}
 
 		val subOffers = details.subscriptionOfferDetails
 		if (!subOffers.isNullOrEmpty()) {
@@ -89,6 +98,52 @@ object Utils {
 		dict["price_amount_micros"] = offer.priceAmountMicros
 		dict["price_currency_code"] = offer.priceCurrencyCode
 		dict["formatted_price"] = offer.formattedPrice
+		dict["full_price_micros"] = offer.fullPriceMicros
+		dict["purchase_option_id"] = offer.purchaseOptionId
+		dict["offer_id"] = offer.offerId
+		dict["offer_token"] = offer.offerToken
+		dict["offer_tags"] = offer.offerTags?.toTypedArray()
+
+		val discount = offer.discountDisplayInfo
+		if (discount != null) {
+			val discountDict = Dictionary()
+			discountDict["discount_amount"] = discount.discountAmount
+			discountDict["percentage_discount"] = discount.percentageDiscount
+			dict["discount_display_info"] = discountDict
+		} else {
+			dict["discount_display_info"] = null
+		}
+
+		val limited = offer.limitedQuantityInfo
+		if (limited != null) {
+			val limitedDict = Dictionary()
+			limitedDict["maximum_quantity"] = limited.maximumQuantity
+			limitedDict["remaining_quantity"] = limited.remainingQuantity
+			dict["limited_quantity_info"] = limitedDict
+		} else {
+			dict["limited_quantity_info"] = null
+		}
+
+		val validTimeWindow = offer.validTimeWindow
+		if (validTimeWindow != null) {
+			val validTimeWindowDict = Dictionary()
+			validTimeWindowDict["start_time_millis"] = validTimeWindow.startTimeMillis
+			validTimeWindowDict["end_time_millis"] = validTimeWindow.endTimeMillis
+			dict["valid_time_window"] = validTimeWindowDict
+		} else {
+			dict["valid_time_window"] = null
+		}
+
+		val rental = offer.rentalDetails
+		if (rental != null) {
+			val rentalDict = Dictionary()
+			rentalDict["start_time_millis"] = rental.rentalPeriod
+			rentalDict["end_time_millis"] = rental.rentalExpirationPeriod
+			dict["rental_details"] = rentalDict
+		} else {
+			dict["rental_details"] = null
+		}
+
 		return dict
 	}
 
