@@ -17,8 +17,28 @@ Before installing, make sure you have:
 
 ## Install the Plugin
 
-1. Download the latest release from the [Releases](https://github.com/godot-sdk-integrations/godot-google-play-billing/releases) page.
-2. Unzip and copy the plugin to your project's `addons` folder:
+You can install the plugin in two ways: directly from the Godot Editor using AssetLib, or manually from the [Godot Asset Store](https://store-beta.godotengine.org/asset/godot-foundation/godot-google-play-billing) or [GitHub releases](https://github.com/godot-sdk-integrations/godot-google-play-billing/releases).
+
+!!! warning
+    Before installing: Remove any previous version of this plugin from your project to avoid conflicts.
+
+**Option 1: Using the Godot Editor (AssetLib)**
+
+1. Open the AssetLib tab in the Godot Editor and search for `Godot Google Play Billing`.
+2. Click Download.
+3. In the installation dialog:
+    - Make sure `Ignore asset root` is **unchecked**.
+    - Click Install.
+4. In main menu, go to `Project > Project Settings > Plugins`, and enable **GodotGooglePlayBilling**.
+
+The plugin is now active in your project.
+
+**Option 2: Manual Installation**
+
+1. Download the latest release from:
+   - [Godot Asset Store](https://store-beta.godotengine.org/asset/godot-foundation/godot-google-play-billing)
+   - [GitHub releases](https://github.com/godot-sdk-integrations/godot-google-play-billing/releases).
+3. Extract and copy the plugin to your project's `addons` folder:
 ```
 [Project root]/addons/GodotGooglePlayBilling/
 ```
