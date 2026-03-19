@@ -22,7 +22,7 @@ You can install the plugin in two ways: directly from the Godot Editor using Ass
 !!! warning
     Before installing: Remove any previous version of this plugin from your project to avoid conflicts.
 
-### Option 1: Using the Godot Editor (AssetLib)**
+### Option 1: Using the Godot Editor (AssetLib)
 
 1. Open the AssetLib tab in the Godot Editor and search for `Godot Google Play Billing`.
 2. Click Download.
