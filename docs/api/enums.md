@@ -1,3 +1,7 @@
+---
+title: Enums
+---
+
 # Enums
 
 Enums used by the billing API.

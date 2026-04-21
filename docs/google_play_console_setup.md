@@ -1,5 +1,6 @@
 ---
-icon: lucide/play
+title: Console Setup
+icon: fontawesome/brands/google-play
 ---
 
 # Google Play Console Setup

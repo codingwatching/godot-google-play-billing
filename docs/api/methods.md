@@ -1,3 +1,7 @@
+---
+title: Methods
+---
+
 # Methods
 
 This page documents all available methods of the `BillingClient` class.

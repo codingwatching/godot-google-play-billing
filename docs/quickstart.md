@@ -1,5 +1,6 @@
 ---
-icon: lucide/rocket
+title: Quick start
+icon: fontawesome/solid/rocket
 ---
 
 # Quick Start

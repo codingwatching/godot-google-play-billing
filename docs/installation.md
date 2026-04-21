@@ -1,5 +1,6 @@
 ---
-icon: lucide/package
+title: Installation
+icon: fontawesome/solid/download
 ---
 
 # Installation

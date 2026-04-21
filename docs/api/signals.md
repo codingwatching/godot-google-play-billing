@@ -1,3 +1,7 @@
+---
+title: Signals
+---
+
 # Signals
 
 This page documents all signals emitted by the `BillingClient`.

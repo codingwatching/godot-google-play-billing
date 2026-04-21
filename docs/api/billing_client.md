@@ -1,3 +1,6 @@
+---
+title: Billing Client
+---
 # BillingClient
 
 `BillingClient` is the main class used to interact with the Google Play Billing service.

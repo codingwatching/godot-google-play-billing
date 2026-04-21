@@ -10,15 +10,15 @@ use_directory_urls = false
 edit_uri  = "edit/master/docs/"
 
 nav = [
-  "index.md",
-  "installation.md",
-  "quickstart.md",
-  "google_play_console_setup.md",
+  { "Overview" = "index.md" },
+  { "Installation" = "installation.md" },
+  { "Quick Start" = "quickstart.md" },
+  { "Console Setup" = "google_play_console_setup.md" },
   { "API Reference" = [
-    "api/billing_client.md",
-    "api/methods.md",
-    "api/signals.md",
-    "api/enums.md"
+    { "Billing Client" = "api/billing_client.md" },
+    { "Methods" = "api/methods.md" },
+    { "Signals" = "api/signals.md" },
+    { "Enums" = "api/enums.md" }
   ]}
 ]
 
